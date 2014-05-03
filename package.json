@@ -1,0 +1,32 @@
+{
+  "name": "shotgun",
+  "version": "0.0.1",
+  "description": "Simple http api that will capture website content as a png and send it back to you",
+  "main": "server.js",
+  "scripts": {
+    "test": "node tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/stevekane/shotgun.git"
+  },
+  "keywords": [
+    "capture",
+    "websites",
+    "phantomjs"
+  ],
+  "author": "Steve Kane",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stevekane/shotgun/issues"
+  },
+  "homepage": "https://github.com/stevekane/shotgun",
+  "dependencies": {
+    "webshot": "^0.13.0",
+    "phantomjs": "^1.9.7-5",
+    "async": "^0.8.0",
+    "restify": "^2.7.0",
+    "moment": "^2.6.0",
+    "lodash": "^2.4.1"
+  }
+}
