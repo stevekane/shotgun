@@ -1,26 +1,41 @@
-var webpage = require('webpage')
+var page = require('webpage').create()
   , system = require("system");
 
 var urls;
+var queue = [];
+
+var addToQueue = function (queue, urls) {
+  urls.forEach(function (url) {
+    queue.push({
+      url: url,
+      inProgress: false 
+    });
+  });
+};
 
 var addDateTime = function (url) {
   return url + ".png";
 };
 
-var captureMultiple = function (urls, eachCb, finalCb) {
-  var index = 0;
+var capturePage = function (item) {
+  item.inProgress = true;
+  console.log(item.url + " in progress...");
+  setTimeout(function () {
+    queue.shift();
+  }, 2000);
 
-  var capture = function () {
-    if (index >= urls.length) {
-      return finalCb(null, "done"); 
-    } else {
-      eachCb(null, urls[index]);
-      index = index + 1;
-      setTimeout(capture, 1000);
-    }
-  };
+  //page.open(url, function () {
+  //  setTimeout(function () {
+  //    page.render(); 
+  //    cb(null, url);
+  //  }, 4000); 
+  //});
+};
 
-  setTimeout(capture, 1000);
+var captureNext = function () {
+  if (queue.length && !queue[0].inProgress) {
+    capturePage(queue[0]);
+  }
 };
 
 var sendFinal = function (err, message) {
@@ -33,7 +48,7 @@ var sendStatus = function (err, message) {
 
 if (system.args.length > 1) {
   urls = JSON.parse(Array.prototype.slice.call(system.args, 1));
-  captureMultiple(urls, sendStatus, sendFinal);
+  addToQueue(queue, urls);
 };
 
-//console.log(system.stdin.readLine());
+setInterval(captureNext, 200);
