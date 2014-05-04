@@ -2,16 +2,9 @@ var phantom = require("phantom")
   , restify = require("restify")
   , uuid = require("node-uuid");
 
-var urls = [
-  //"http://google.com",
-  //"http://github.com",
-  //"http://facebook.com",
-  //"http://reddit.com",
-  //"http://instagram.com",
-  //"http://digg.com"
-];
-
 var queue = [];
+var server = restify.createServer();
+
 var addToQueue = function (url, cb) {
   var id = uuid.v4()
     , fileName = id + ".png";
@@ -25,7 +18,6 @@ var addToQueue = function (url, cb) {
   });
 };
 
-var server = restify.createServer();
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
@@ -64,7 +56,7 @@ phantom.create(function (ph) {
           page.render(item.fileName); 
           item.cb(null, item.fileName);
           queue.shift();
-        }, 4000); 
+        }, 200); 
       });
     };
 
@@ -81,8 +73,8 @@ phantom.create(function (ph) {
       console.log("some error occured"); 
     });
     page.set("viewportSize", {
-      width: 1920,
-      height: 1200 
+      width: 1200,
+      height: 800 
     });
   });
 });
