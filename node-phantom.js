@@ -31,14 +31,11 @@ server.post("/capture", function (req, res, next) {
       if (err) {
         return res.send(400, {err: err.message || err});
       } else {
-        return res.send(200, image + " has been created"); 
+        res.setHeader({"Content-type": "image/png"});
+        return res.send(200, image); 
       }
     }); 
   }
-});
-
-server.listen(8080, function () {
-  console.log("listening on port 8080");
 });
 
 phantom.create(function (ph) {
@@ -51,11 +48,12 @@ phantom.create(function (ph) {
       item.inProgress = true;
 
       page.open(item.url, function () {
-        //we wait 4seconds to allow assets to load
+        //we wait 200 ms to allow js to run
         setTimeout(function () {
-          page.render(item.fileName); 
-          item.cb(null, item.fileName);
-          queue.shift();
+          page.renderBase64("PNG", function (image) {
+            item.cb(null, image);
+            queue.shift();
+          }); 
         }, 200); 
       });
     };
@@ -77,4 +75,8 @@ phantom.create(function (ph) {
       height: 800 
     });
   });
+});
+
+server.listen(8080, function () {
+  console.log("listening on port 8080");
 });
