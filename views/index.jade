@@ -1,0 +1,12 @@
+doctype html
+html(lang="en")
+  head
+    title Test of image processor
+  body
+    form#captureForm
+      input#urlInput(type="text", name="url")
+      button(type="submit") Fetch
+    img#targetImage
+
+    script(type="text/javascript", src="/jquery.js")
+    script(type="text/javascript", src="/client.js")

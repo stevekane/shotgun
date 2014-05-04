@@ -18,7 +18,13 @@ var addToQueue = function (url, cb) {
   });
 };
 
+server.use(restify.CORS());
+server.use(restify.acceptParser(server.acceptable));
+server.use(restify.authorizationParser());
+server.use(restify.dateParser());
 server.use(restify.queryParser());
+server.use(restify.jsonp());
+server.use(restify.gzipResponse());
 server.use(restify.bodyParser());
 
 server.post("/capture", function (req, res, next) {
@@ -31,8 +37,7 @@ server.post("/capture", function (req, res, next) {
       if (err) {
         return res.send(400, {err: err.message || err});
       } else {
-        res.setHeader({"Content-type": "image/png"});
-        return res.send(200, image); 
+        return res.send(200, {image: image}); 
       }
     }); 
   }
