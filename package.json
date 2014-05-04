@@ -27,6 +27,8 @@
     "async": "^0.8.0",
     "restify": "^2.7.0",
     "moment": "^2.6.0",
-    "lodash": "^2.4.1"
+    "lodash": "^2.4.1",
+    "phantom": "^0.6.1",
+    "node-uuid": "^1.4.1"
   }
 }
