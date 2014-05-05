@@ -1,17 +1,8 @@
 var phantom = require("phantom")
   , restify = require("restify")
+  , async = require("async")
   , _ = require("lodash")
-  , map = _.map
-  , pluck = _.pluck
-  , partial = _.partial
-  , uuid = require('node-uuid')
-  , parseUrl = require('url').parse
-  , async = require("async");
-
-//maximum concurrent tabs allowed open in phantom process
-var TAB_COUNT = 20;
-//time a tab waits before capturing page to allow js to run
-var RENDER_DELAY = 200;
+  , partial = _.partial;
 
 /*
  * Our queue object manages the maximum number of items that
@@ -31,21 +22,14 @@ var RENDER_DELAY = 200;
  *      HTTP RES w/ json containing image string
 */
 
-var urls = [
-  "http://www.google.com",
-  "http://www.reddit.com",
-  "http://www.github.com",
-  "http://www.slashdot.org",
-  "http://www.rottentomatoes.com",
-  "http://www.twitter.com",
-  "http://www.instagram.com",
-  "http://www.page-vault.com",
-  "http://bitbucket.org",
-  "http://lawyers.com"
-];
+var options = {
+  "TAB_COUNT": 20,
+  "RENDER_DELAY": 200,
+  "DEBUG": false
+};
 
 //given an instance of phantom, process url and cb with image string
-var captureBase64 = function (phantom, url, cb) {
+var captureBase64 = function (phantom, options, url, cb) {
   phantom.createPage(function (page) {
     page.set("onError", function (msg, trace) {
       console.log(url + " reported: " + msg); 
@@ -60,71 +44,51 @@ var captureBase64 = function (phantom, url, cb) {
           cb(null, image); 
           page.close();
         }); 
-      }, RENDER_DELAY); 
+      }, options.RENDER_DELAY); 
     });
   }); 
 };
 
-//given instance of phantom, process url and save image to disk
-var captureToDisk = function (phantom, url, cb) {
-  phantom.createPage(function (page) {
-    page.set("onError", function (msg, trace) {
-      console.log(url + " reported: " + msg); 
-    });
-    page.set("viewportSize", {
-      width: 1200,
-      height: 800 
-    });
-    page.open(url, function () {
-      var fileName = parseUrl(url).host + uuid.v4() + ".png";
+//configure routes w/ instance of queue and server
+var setupRoutes = function (queue, server) {
+  server.post("/capture", function (req, res, next) {
+    var url = req.body.url;
+    var respond = function (err, image) {
+      if (err) return res.send(400, {err: err.message || err});
+      else return res.send(200, {image: image}); 
+    };
 
-      setTimeout(function () {
-        page.render(fileName, function (err) {
-          cb(null, fileName); 
-          page.close();
-        }); 
-      }, RENDER_DELAY); 
-    });
-  }); 
+    if (!url) return res.send(400, {err: "No url provided"});
+    else queue.push(url, respond);
+  });
 };
 
-//for testing
-var testCapture = function (phantom, url, cb) {
-  setTimeout(function () {
-    cb(null, url + " was captured."); 
-  }, 1000);
+//helper to read status of queue
+var reportQueueStatus = function (queue) {
+  console.log(queue.length() + " waiting");
+  console.log(queue.running() + " processing");
 };
 
-//for testing
-var logResult = function (err, res) {
-  if (err) console.log(err); 
-  console.log(res); 
+//called to create phantom instance, queue, and webserver
+var boot = function (options) {
+  phantom.create(function (ph) {
+    var captureFn = partial(captureBase64, ph, options);
+    var queue = async.queue(captureFn, options.TAB_COUNT);
+    var server = restify.createServer();
+
+    server.use(restify.CORS());
+    server.use(restify.acceptParser(server.acceptable));
+    server.use(restify.authorizationParser());
+    server.use(restify.dateParser());
+    server.use(restify.queryParser());
+    server.use(restify.jsonp());
+    server.use(restify.gzipResponse());
+    server.use(restify.bodyParser());
+
+    setupRoutes(queue, server);
+    if (options.DEBUG) setInterval(partial(reportQueueStatus, queue), 2000);
+    server.listen(8080, console.log.bind(console, "Listening on 8080"));
+  });
 };
 
-
-/*
- * create an instance of phantom.  create a queue with a callback
- * that has a reference to our phantom instance.
- * TODO: Queue probably needs to have ability to transfar to new
- * phantom instance if this one dies....
- */
-phantom.create(function (ph) {
-  //var queue = async.queue(partial(captureBase64, ph), TAB_COUNT);
-  //var queue = async.queue(partial(testCapture, ph), TAB_COUNT);
-  var processUrl = partial(captureToDisk, ph);
-  var queue = async.queue(processUrl, TAB_COUNT);
-
-  urls.forEach(function (url) {
-    queue.push(url, logResult);
-  });
-  urls.forEach(function (url) {
-    queue.push(url, logResult);
-  });
-  urls.forEach(function (url) {
-    queue.push(url, logResult);
-  });
-
-  queue.drain = function () {
-    console.log("queue empty!!!!!!!!!!!!!!!!"); 
-  };
-});
+boot(options);

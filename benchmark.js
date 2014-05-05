@@ -13,18 +13,117 @@ var urls = [
   "http://www.instagram.com",
   "http://www.page-vault.com",
   "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
+  "http://lawyers.com",
+  "http://www.google.com",
+  "http://www.reddit.com",
+  "http://www.github.com",
+  "http://www.slashdot.org",
+  "http://www.rottentomatoes.com",
+  "http://www.twitter.com",
+  "http://www.instagram.com",
+  "http://www.page-vault.com",
+  "http://bitbucket.org",
   "http://lawyers.com"
 ];
 
+//create pool to increase concurrent request count
+var requestPool = {
+  maxSockets: 100
+};
+
+//FIXME: Some connections may still be timing out?  investigate
 var postToUrl = function (url, cb) {
+  var timeout = 1000 * 60 * 5;
   var targetUrl = "http://localhost:8080/capture";
   var options = {
-    url: url,
+    timeout: timeout,
+    pool: requestPool,
+    url: targetUrl,
     json: {
       url: url 
     }
   };
-  return request.post(targetUrl, options, function (err, res, body) {
+  return request.post(options, function (err, res, body) {
     cb(err, body); 
   });
 };
@@ -41,8 +140,9 @@ test("find out how long it takes to return valid image for 1 query", function (t
   });
 });
 
-test("find out how long it takes to return valid results for 10 queries", function (t) {
-  t.plan(20);
+test("find out how long it takes to return valid results for 100 queries", function (t) {
+  t.plan(urls.length);
+  //t.plan(urls.length * 2);
   var start = Date.now();
   var counter = 0;
 
@@ -52,8 +152,9 @@ test("find out how long it takes to return valid results for 10 queries", functi
       var elapsed = stamp - start;
       counter = counter + 1;
 
-      t.true(!err, "no errors during processing of " + url);
-      t.true(typeof res.image === "string", counter + "/10 " + url + " in " + elapsed + " ms");
+      //t.true(!err, "no errors during processing of " + url);
+      if (err) t.true(!!err, "There was an error with " + counter + "/100 " + url);
+      else t.true(typeof res.image === "string", counter + "/100 " + url + " in " + elapsed + " ms");
       cb(err, res);
     }, function (err) {
       t.true(!err, "no errors during processing of 10 queries");
