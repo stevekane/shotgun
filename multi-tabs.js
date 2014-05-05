@@ -4,11 +4,12 @@ var phantom = require("phantom")
   , map = _.map
   , pluck = _.pluck
   , partial = _.partial
-  , async = require("async")
-  , uuid = require("node-uuid");
+  , uuid = require('node-uuid')
+  , parseUrl = require('url').parse
+  , async = require("async");
 
 //maximum concurrent tabs allowed open in phantom process
-var TAB_COUNT = 2;
+var TAB_COUNT = 20;
 //time a tab waits before capturing page to allow js to run
 var RENDER_DELAY = 200;
 
@@ -43,13 +44,43 @@ var urls = [
   "http://lawyers.com"
 ];
 
-//given an instance of phantom, process a url and fire cb
-var capturePage = function (phantom, url, cb) {
+//given an instance of phantom, process url and cb with image string
+var captureBase64 = function (phantom, url, cb) {
   phantom.createPage(function (page) {
+    page.set("onError", function (msg, trace) {
+      console.log(url + " reported: " + msg); 
+    });
+    page.set("viewportSize", {
+      width: 1200,
+      height: 800 
+    });
     page.open(url, function () {
-      setTimout(function () {
+      setTimeout(function () {
         page.renderBase64("png", function (image) {
           cb(null, image); 
+          page.close();
+        }); 
+      }, RENDER_DELAY); 
+    });
+  }); 
+};
+
+//given instance of phantom, process url and save image to disk
+var captureToDisk = function (phantom, url, cb) {
+  phantom.createPage(function (page) {
+    page.set("onError", function (msg, trace) {
+      console.log(url + " reported: " + msg); 
+    });
+    page.set("viewportSize", {
+      width: 1200,
+      height: 800 
+    });
+    page.open(url, function () {
+      var fileName = parseUrl(url).host + uuid.v4() + ".png";
+
+      setTimeout(function () {
+        page.render(fileName, function (err) {
+          cb(null, fileName); 
           page.close();
         }); 
       }, RENDER_DELAY); 
@@ -74,12 +105,26 @@ var logResult = function (err, res) {
 /*
  * create an instance of phantom.  create a queue with a callback
  * that has a reference to our phantom instance.
+ * TODO: Queue probably needs to have ability to transfar to new
+ * phantom instance if this one dies....
  */
 phantom.create(function (ph) {
-  //var queue = async.queue(partial(capturePage, ph), TAB_COUNT);
-  var queue = async.queue(partial(testCapture, ph), TAB_COUNT);
+  //var queue = async.queue(partial(captureBase64, ph), TAB_COUNT);
+  //var queue = async.queue(partial(testCapture, ph), TAB_COUNT);
+  var processUrl = partial(captureToDisk, ph);
+  var queue = async.queue(processUrl, TAB_COUNT);
 
   urls.forEach(function (url) {
     queue.push(url, logResult);
   });
+  urls.forEach(function (url) {
+    queue.push(url, logResult);
+  });
+  urls.forEach(function (url) {
+    queue.push(url, logResult);
+  });
+
+  queue.drain = function () {
+    console.log("queue empty!!!!!!!!!!!!!!!!"); 
+  };
 });
