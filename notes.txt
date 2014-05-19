@@ -1,0 +1,35 @@
+Interface for HTTP process
+
+REQUEST THAT I SEND
+
+SnapshotSTRUCT
+AccountUser:          Num (passed from caller)
+SnapshotGuid:         String (UUID)
+SnapshotName:         String (user chosen or default sitename + date.png)
+  hostname_YYY-MM-SS   standard
+IsFullPage:           Bool (DO NOT NEED)
+ServerUrl:            String Exact url captured
+InitialLoadTimeUTC:   String (needs to be set when capture begins)
+PageVaultServerIp:    String retrieve api.page-vault.com/utils/myip once per batch req
+CaptureWebsiteIp:     String server url translated to ip address
+FolderId:             Num ID of the target folder where these will go
+HeaderOverlapPixels:  Num 125 (for now, may be selectable)
+OsVersion:            String (DO NOT NEED)
+BrowserVersion:       String (DO NOT NEED)
+ViewportSize: {
+  width: Num, 
+  height: Num
+}
+ExtendedProperties: [{k:v}]
+Snapshot: {
+  type: "png",
+  value: Base64 encoded string
+}
+Dom: String
+Html: String
+
+RESPONSE
+
+err 400, w/ message
+200, w/ message
+timeout on 5minutes (18000)

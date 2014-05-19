@@ -2,4 +2,5 @@
 *.orig
 *.swo
 *.png
+config.json
 node_modules/
