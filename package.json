@@ -39,6 +39,8 @@
     "zlib": "^1.0.5",
     "through": "^2.3.4",
     "hyperquest": "^0.3.0",
-    "aws-sdk": "^2.0.0-rc.17"
+    "aws-sdk": "^2.0.0-rc.17",
+    "coffeeify": "^0.6.0",
+    "reactify": "^0.13.1"
   }
 }
