@@ -4,7 +4,8 @@
   "description": "Simple http api that will capture website content as a png and send it back to you",
   "main": "server.js",
   "scripts": {
-    "test": "node tests"
+    "test": "node tests",
+    "build": "browserify -x react -x jquery-browserify -x lodash -t coffeeify assets/client.coffee -o assets/client.js"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,9 @@
     "hyperquest": "^0.3.0",
     "aws-sdk": "^2.0.0-rc.17",
     "coffeeify": "^0.6.0",
-    "reactify": "^0.13.1"
+    "reactify": "^0.13.1",
+    "envify": "^1.2.1",
+    "react": "^0.10.0",
+    "jquery-browserify": "^1.8.1"
   }
 }

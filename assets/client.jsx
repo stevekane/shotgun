@@ -1,4 +1,6 @@
-var input = React.DOM.input
+var React = require("react")
+  , _ = require("lodash")
+  , input = React.DOM.input
   , select = React.DOM.select
   , div = React.DOM.div
   , span = React.DOM.span
@@ -6,7 +8,7 @@ var input = React.DOM.input
   , h2 = React.DOM.h2
   , url = "http://localhost:8080/process";
 
-window.appState = {
+appState = {
   user: {
     id: "",
     email: "" 
@@ -16,7 +18,7 @@ window.appState = {
 };
 
 var sendRequest = function (appState, url) {
-  var paylaod = {
+  var payload = {
     email: appState.user.email,
     user: appState.user.id,
     folderId: appState.folderId,
