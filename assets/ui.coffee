@@ -16,7 +16,6 @@ TokenForm = React.createClass
 
   render: ->
     form {role: "form", className: "form-horizontal"},
-      span {className: "help-text"}, @props.form.error
 
       div {className: "form-group"},
         label {className: "control-label col-xs-2"}, "token"
@@ -26,6 +25,7 @@ TokenForm = React.createClass
             onChange: @updateToken
             value: @props.form.value
             disabled: @props.form.inFlight
+          span {className: "help-text"}, @props.form.error
 
       div {className: "form-group"},
         div {className: "col-xs-10 col-xs-offset-2"},
@@ -74,8 +74,6 @@ BatchForm = React.createClass
       href
 
     form {role: "form", className: "form-horizontal"},
-      span {className: "help-text"}, @props.form.error
-
       div {className: "form-group"},
         label {className: "control-label col-xs-2"}, "email"
         div {className: "col-xs-10"},
@@ -102,6 +100,7 @@ BatchForm = React.createClass
             onKeyPress: @handleKeyPress
             value: @props.form.newUrlName
             placeholder: "e.g. http://www.google.com"
+          span {className: "help-text"}, @props.form.error
 
       div {className: "form-group"},
         div {className: "col-xs-10 col-xs-offset-2"},

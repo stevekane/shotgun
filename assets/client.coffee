@@ -1,3 +1,4 @@
+parseUrl = require("url").parse
 React = require "react"
 _ = require "lodash"
 $ = require "jquery-browserify"
@@ -70,8 +71,12 @@ transactions =
     appState.forms.batch.newUrlName = name
 
   addUrl: (href) ->
-    url = Url(href)
-    appState.forms.batch.urls.push(url)
+    {protocol} = parseUrl(href)
+    if (protocol)
+      appState.forms.batch.urls.push(Url(href))
+    else
+      appState.forms.batch.error = "Must provide a protocol.  e.g. http"
+      setTimeout((-> appState.forms.batch.error = ""), 4000)
 
   displayErrorFor: (formName, msg) ->
     appState.forms[formName]?.error= msg
