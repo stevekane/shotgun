@@ -153,11 +153,13 @@ draw();
 
 
 },{"./ui.coffee":2,"jquery-browserify":"WRz1uS","lodash":"YNP8J9","react":"44ijaO"}],2:[function(require,module,exports){
-var BatchForm, React, TokenForm, UserInfo, button, div, form, h1, h2, input, label, select, span, table, td, th, tr, _ref;
+var BatchForm, React, TokenForm, UserInfo, button, div, form, h1, h2, input, isEqual, label, map, option, select, span, table, td, th, tr, _ref, _ref1;
 
 React = require("react");
 
-_ref = React.DOM, table = _ref.table, th = _ref.th, tr = _ref.tr, td = _ref.td, button = _ref.button, form = _ref.form, label = _ref.label, input = _ref.input, select = _ref.select, div = _ref.div, span = _ref.span, h1 = _ref.h1, h2 = _ref.h2;
+_ref = require("lodash"), map = _ref.map, isEqual = _ref.isEqual;
+
+_ref1 = React.DOM, table = _ref1.table, th = _ref1.th, tr = _ref1.tr, td = _ref1.td, button = _ref1.button, form = _ref1.form, label = _ref1.label, input = _ref1.input, select = _ref1.select, option = _ref1.option, div = _ref1.div, span = _ref1.span, h1 = _ref1.h1, h2 = _ref1.h2;
 
 TokenForm = React.createClass({
   updateToken: function(e) {
@@ -229,11 +231,29 @@ BatchForm = React.createClass({
       className: "form-control",
       onChange: this.updateEmail,
       value: this.props.form.email
-    }))));
+    }))), div({
+      className: "form-group"
+    }, label({
+      className: "control-label col-xs-2"
+    }, "folder"), div({
+      className: "col-xs-10"
+    }, select({
+      className: "form-control",
+      onChange: this.updateFolderId,
+      value: this.props.form.folderId
+    }, map(this.props.folders, function(folder) {
+      return option({
+        value: folder.id,
+        key: folder.id
+      }, folder.name);
+    })))));
   }
 });
 
 module.exports = React.createClass({
+  shouldComponentUpdate: function(next) {
+    return isEqual(next, this.props);
+  },
   updateEmail: function(e) {
     return this.props.transactions.updateEmail(e.target.value);
   },
@@ -269,10 +289,11 @@ module.exports = React.createClass({
       remotes: {
         sendBatchRequest: this.props.remotes.sendBatchRequest
       },
-      form: this.props.appState.forms.batch
+      form: this.props.appState.forms.batch,
+      folders: this.props.appState.user.folders
     }))) : void 0)));
   }
 });
 
 
-},{"react":"44ijaO"}]},{},[1])
+},{"lodash":"YNP8J9","react":"44ijaO"}]},{},[1])

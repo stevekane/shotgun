@@ -1,5 +1,6 @@
 React = require "react"
-{table, th, tr, td, button, form, label, input, select, div, span, h1, h2} = React.DOM
+{map, isEqual} = require "lodash"
+{table, th, tr, td, button, form, label, input, select, option, div, span, h1, h2} = React.DOM
 
 TokenForm = React.createClass
 
@@ -33,6 +34,7 @@ TokenForm = React.createClass
           }, "get user"
 
 UserInfo = React.createClass
+
   render: ->
     table {className: "table table-hover"},
       tr {className: "active"},
@@ -43,6 +45,7 @@ UserInfo = React.createClass
         td {}, @props.id
 
 BatchForm = React.createClass
+
   updateEmail: (e) ->
     @props.transactions.updateEmail(e.target.value)
 
@@ -57,8 +60,22 @@ BatchForm = React.createClass
             className: "form-control"
             onChange: @updateEmail
             value: @props.form.email
+      div {className: "form-group"},
+        label {className: "control-label col-xs-2"}, "folder"
+        div {className: "col-xs-10"},
+          select {
+            className: "form-control"
+            onChange: @updateFolderId
+            value: @props.form.folderId
+          },
+          map(@props.folders, (folder) ->
+            option {value: folder.id, key: folder.id}, folder.name
+          )
 
 module.exports = React.createClass
+
+  shouldComponentUpdate: (next) ->
+    isEqual(next, @props)
 
   updateEmail: (e) ->
     @props.transactions.updateEmail(e.target.value)
@@ -88,3 +105,4 @@ module.exports = React.createClass
                   remotes:
                     sendBatchRequest: @props.remotes.sendBatchRequest
                   form: @props.appState.forms.batch
+                  folders: @props.appState.user.folders
