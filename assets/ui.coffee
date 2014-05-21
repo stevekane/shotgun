@@ -69,8 +69,9 @@ BatchForm = React.createClass
     folders = map @props.folders, (folder) ->
       option {value: folder.id, key: folder.id}, folder.name
 
-    urls = map @props.form.urls, (url) ->
-      a {className: "list-group-item", href: url, target: "newtab"}, url
+    urls = map @props.form.urls, ({href, id}) ->
+      a {className: "list-group-item", href: href, key: id, target: "newtab"},
+      href
 
     form {role: "form", className: "form-horizontal"},
       span {className: "help-text"}, @props.form.error

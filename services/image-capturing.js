@@ -1,4 +1,5 @@
-var phantom = require("phantom")
+var parseUrl = require("url").parse
+  , phantom = require("phantom")
   , moment = require("moment")
   , _ = require("lodash")
   , partial = _.partial;
@@ -12,7 +13,9 @@ module.exports = function (options) {
 
   //create fileName from url and timestamp
   var buildName = function (url, utcMoment) {
-    return url + "_" + utcMoment.format("YYYY-MM-DD-hh-mm-ss") + ".png";
+    return parseUrl(url).host 
+    + "_" + utcMoment.format("YYYY-MM-DD-hh-mm-ss") 
+    + ".png";
   };
 
   //given an instance of phantom, process url and cb with image string

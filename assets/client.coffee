@@ -1,6 +1,7 @@
 React = require "react"
 _ = require "lodash"
 $ = require "jquery-browserify"
+uuid = require "node-uuid"
 {partial, map} = _
 Main = require "./ui.coffee"
 appNode = document.getElementById("app")
@@ -11,6 +12,15 @@ To build, run the following from the root of the project
 browserify -x react -x lodash -x jquery-browserify -t coffeeify assets/client.coffee  -o assets/client.js
 this runs browserify w/ external dependencies loaded from vendor.js and uses the coffeescript transform
 ###
+
+#START Struct defs
+
+Url = (href) ->
+  href: href
+  id: uuid.v4()
+
+#END Struct defs
+
 
 appState =
   forms:
@@ -59,8 +69,9 @@ transactions =
   updateNewUrlName: (name) ->
     appState.forms.batch.newUrlName = name
 
-  addUrl: (name) ->
-    appState.forms.batch.urls.push(name)
+  addUrl: (href) ->
+    url = Url(href)
+    appState.forms.batch.urls.push(url)
 
   displayErrorFor: (formName, msg) ->
     appState.forms[formName]?.error= msg
