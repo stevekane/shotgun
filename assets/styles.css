@@ -16,3 +16,7 @@ body {
   background-color: gray;
   padding: 10px;
 }
+
+td, th {
+  color: black;
+}

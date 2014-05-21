@@ -52,8 +52,7 @@ transactions = {
     return appState.user.email = newUser.email;
   },
   updateFolders: function(folders) {
-    appState.user.folders = folders;
-    return log(folders);
+    return appState.user.folders = folders;
   },
   updateToken: function(value) {
     return appState.forms.token.value = value;
@@ -151,11 +150,11 @@ draw();
 
 
 },{"./ui.coffee":2,"jquery-browserify":"WRz1uS","lodash":"YNP8J9","react":"44ijaO"}],2:[function(require,module,exports){
-var React, TokenForm, UserInfo, button, div, form, h1, h2, input, label, select, span, table, _ref;
+var React, TokenForm, UserInfo, button, div, form, h1, h2, input, label, select, span, table, td, th, tr, _ref;
 
 React = require("react");
 
-_ref = React.DOM, table = _ref.table, button = _ref.button, form = _ref.form, label = _ref.label, input = _ref.input, select = _ref.select, div = _ref.div, span = _ref.span, h1 = _ref.h1, h2 = _ref.h2;
+_ref = React.DOM, table = _ref.table, th = _ref.th, tr = _ref.tr, td = _ref.td, button = _ref.button, form = _ref.form, label = _ref.label, input = _ref.input, select = _ref.select, div = _ref.div, span = _ref.span, h1 = _ref.h1, h2 = _ref.h2;
 
 TokenForm = React.createClass({
   updateToken: function(e) {
@@ -199,11 +198,11 @@ UserInfo = React.createClass({
   render: function() {
     return table({
       className: "table table-hover"
-    }, th({
+    }, tr({
       className: "active"
-    }, tr({}, email), tr({}, id), tr({}, folderCount)), th({
+    }, th({}, "email"), th({}, "id"), th({}, "folderCount")), tr({
       className: "info"
-    }, tr({}, this.props.email), tr({}, this.props.id), tr({}, this.props.foldersCount)));
+    }, td({}, this.props.email), td({}, this.props.id), td({}, this.props.folderCount)));
   }
 });
 
@@ -227,14 +226,14 @@ module.exports = React.createClass({
         fetchFolders: this.props.remotes.fetchFolders
       },
       form: this.props.appState.forms.token
-    }), this.props.appState.user.id ? (UserInfo({
+    }), this.props.appState.user.id ? form({
+      role: "form",
+      className: "form-horizontal"
+    }, UserInfo({
       email: this.props.appState.user.email,
       id: this.props.appState.user.id,
       folderCount: this.props.appState.user.folders.length
-    }), form({
-      role: "form",
-      className: "form-horizontal"
-    }, span({
+    }), span({
       className: "help-text"
     }, this.props.appState.forms.batch.error), div({
       className: "form-group"
@@ -246,7 +245,7 @@ module.exports = React.createClass({
       className: "form-control",
       onChange: this.updateEmail,
       value: this.props.appState.user.email
-    }))))) : void 0)));
+    })))) : void 0)));
   }
 });
 

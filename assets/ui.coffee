@@ -1,5 +1,5 @@
 React = require "react"
-{table, button, form, label, input, select, div, span, h1, h2} = React.DOM
+{table, th, tr, td, button, form, label, input, select, div, span, h1, h2} = React.DOM
 
 TokenForm = React.createClass
 
@@ -36,14 +36,14 @@ TokenForm = React.createClass
 UserInfo = React.createClass
   render: ->
     table {className: "table table-hover"},
-      th {className: "active"},
-        tr {}, email
-        tr {}, id
-        tr {}, folderCount
-      th {className: "info"},
-        tr {}, @props.email
-        tr {}, @props.id
-        tr {}, @props.foldersCount
+      tr {className: "active"},
+        th {}, "email"
+        th {}, "id"
+        th {}, "folderCount"
+      tr {className: "info"},
+        td {}, @props.email
+        td {}, @props.id
+        td {}, @props.folderCount
 
 module.exports = React.createClass
 
@@ -63,12 +63,12 @@ module.exports = React.createClass
             form: @props.appState.forms.token
 
           if @props.appState.user.id
-            UserInfo
-              email: @props.appState.user.email
-              id: @props.appState.user.id
-              folderCount: @props.appState.user.folders.length
-
             form {role: "form", className: "form-horizontal"},
+              UserInfo
+                email: @props.appState.user.email
+                id: @props.appState.user.id
+                folderCount: @props.appState.user.folders.length
+
               span {className: "help-text"}, @props.appState.forms.batch.error
 
               div {className: "form-group"},

@@ -39,7 +39,6 @@ transactions =
 
   updateFolders: (folders) ->
     appState.user.folders = folders
-    log(folders)
 
   updateToken: (value) ->
     appState.forms.token.value = value
