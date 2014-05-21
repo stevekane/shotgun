@@ -23,6 +23,7 @@ appState =
       inFlight: false
       folderId: ""
       email: ""
+      newUrlName: ""
       urls: []
 
   user:
@@ -51,6 +52,12 @@ transactions =
 
   updateEmail: (email) ->
     appState.forms.batch.email = email
+
+  updateFolderId: (id) ->
+    appState.forms.batch.folderId = id
+
+  updateNewUrlName: (name) ->
+    appState.forms.batch.newUrlName = name
 
   displayErrorFor: (formName, msg) ->
     appState.forms[formName]?.error= msg

@@ -46,8 +46,12 @@ UserInfo = React.createClass
 
 BatchForm = React.createClass
 
-  updateEmail: (e) ->
+  updateEmail: (e, val) ->
     @props.transactions.updateEmail(e.target.value)
+
+  updateFolderId: (e, val) ->
+    @props.transactions.updateFolderId(e.target.value)
+
 
   render: ->
     form {role: "form", className: "form-horizontal"},
@@ -77,9 +81,6 @@ module.exports = React.createClass
   shouldComponentUpdate: (next) ->
     isEqual(next, @props)
 
-  updateEmail: (e) ->
-    @props.transactions.updateEmail(e.target.value)
-
   render: ->
     div {className: "row"},
       div {className: "col-xs-12"},
@@ -102,6 +103,7 @@ module.exports = React.createClass
                 BatchForm
                   transactions:
                     updateEmail: @props.transactions.updateEmail
+                    updateFolderId: @props.transactions.updateFolderId
                   remotes:
                     sendBatchRequest: @props.remotes.sendBatchRequest
                   form: @props.appState.forms.batch

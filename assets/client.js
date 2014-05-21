@@ -36,6 +36,7 @@ appState = {
       inFlight: false,
       folderId: "",
       email: "",
+      newUrlName: "",
       urls: []
     }
   },
@@ -67,6 +68,12 @@ transactions = {
   },
   updateEmail: function(email) {
     return appState.forms.batch.email = email;
+  },
+  updateFolderId: function(id) {
+    return appState.forms.batch.folderId = id;
+  },
+  updateNewUrlName: function(name) {
+    return appState.forms.batch.newUrlName = name;
   },
   displayErrorFor: function(formName, msg) {
     var _ref;
@@ -212,8 +219,13 @@ UserInfo = React.createClass({
 });
 
 BatchForm = React.createClass({
-  updateEmail: function(e) {
+  updateEmail: function(e, val) {
+    console.log(val);
     return this.props.transactions.updateEmail(e.target.value);
+  },
+  updateFolderId: function(e, val) {
+    console.log(val);
+    return this.props.transactions.updateFolderId(e.target.value);
   },
   render: function() {
     return form({
@@ -254,9 +266,6 @@ module.exports = React.createClass({
   shouldComponentUpdate: function(next) {
     return isEqual(next, this.props);
   },
-  updateEmail: function(e) {
-    return this.props.transactions.updateEmail(e.target.value);
-  },
   render: function() {
     return div({
       className: "row"
@@ -284,7 +293,8 @@ module.exports = React.createClass({
       className: "col-xs-12"
     }, BatchForm({
       transactions: {
-        updateEmail: this.props.transactions.updateEmail
+        updateEmail: this.props.transactions.updateEmail,
+        updateFolderId: this.props.transactions.updateFolderId
       },
       remotes: {
         sendBatchRequest: this.props.remotes.sendBatchRequest
