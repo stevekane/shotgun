@@ -66,7 +66,7 @@ transactions = {
     return (_ref = appState.forms[formName]) != null ? _ref.inFlight = false : void 0;
   },
   updateEmail: function(email) {
-    return appState.user.email = email;
+    return appState.forms.batch.email = email;
   },
   displayErrorFor: function(formName, msg) {
     var _ref;
@@ -134,6 +134,9 @@ remotes = {
         return alert("Folders could not be loaded!");
       });
     }
+  },
+  sendBatchRequest: function() {
+    return alert("Batch request sent.  IMPLEMENT!");
   }
 };
 
@@ -150,7 +153,7 @@ draw();
 
 
 },{"./ui.coffee":2,"jquery-browserify":"WRz1uS","lodash":"YNP8J9","react":"44ijaO"}],2:[function(require,module,exports){
-var React, TokenForm, UserInfo, button, div, form, h1, h2, input, label, select, span, table, td, th, tr, _ref;
+var BatchForm, React, TokenForm, UserInfo, button, div, form, h1, h2, input, label, select, span, table, td, th, tr, _ref;
 
 React = require("react");
 
@@ -200,9 +203,33 @@ UserInfo = React.createClass({
       className: "table table-hover"
     }, tr({
       className: "active"
-    }, th("email"), th("id"), th("folderCount")), tr({
+    }, th({}, "email"), th({}, "id")), tr({
       className: "info"
-    }, td(this.props.email), td(this.props.id), td(this.props.folderCount)));
+    }, td({}, this.props.email), td({}, this.props.id)));
+  }
+});
+
+BatchForm = React.createClass({
+  updateEmail: function(e) {
+    return this.props.transactions.updateEmail(e.target.value);
+  },
+  render: function() {
+    return form({
+      role: "form",
+      className: "form-horizontal"
+    }, span({
+      className: "help-text"
+    }, this.props.form.error), div({
+      className: "form-group"
+    }, label({
+      className: "control-label col-xs-2"
+    }, "email"), div({
+      className: "col-xs-10"
+    }, input({
+      className: "form-control",
+      onChange: this.updateEmail,
+      value: this.props.form.email
+    }))));
   }
 });
 
@@ -227,27 +254,23 @@ module.exports = React.createClass({
       },
       form: this.props.appState.forms.token
     }), this.props.appState.user.id ? div({
-      className: "form-container"
+      className: "row"
+    }, div({
+      className: "col-xs-10 col-xs-offset-2"
     }, UserInfo({
       email: this.props.appState.user.email,
-      id: this.props.appState.user.id,
-      folderCount: this.props.appState.user.folders.length
-    }), form({
-      role: "form",
-      className: "form-horizontal"
-    }, span({
-      className: "help-text"
-    }, this.props.appState.forms.batch.error), div({
-      className: "form-group"
-    }, label({
-      className: "control-label col-xs-2"
-    }, "email"), div({
-      className: "col-xs-10"
-    }, input({
-      className: "form-control",
-      onChange: this.updateEmail,
-      value: this.props.appState.user.email
-    }))))) : void 0)));
+      id: this.props.appState.user.id
+    })), div({
+      className: "col-xs-12"
+    }, BatchForm({
+      transactions: {
+        updateEmail: this.props.transactions.updateEmail
+      },
+      remotes: {
+        sendBatchRequest: this.props.remotes.sendBatchRequest
+      },
+      form: this.props.appState.forms.batch
+    }))) : void 0)));
   }
 });
 

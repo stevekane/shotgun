@@ -18,12 +18,11 @@ TokenForm = React.createClass
       div {className: "form-group"},
         label {className: "control-label col-xs-2"}, "token"
         div {className: "col-xs-10"},
-          input {
-            className: "form-control",
-            onChange: @updateToken,
+          input
+            className: "form-control"
+            onChange: @updateToken
             value: @props.form.value
             disabled: @props.form.inFlight
-          }
 
       div {className: "form-group"},
         div {className: "col-xs-10 col-xs-offset-2"},
@@ -39,11 +38,25 @@ UserInfo = React.createClass
       tr {className: "active"},
         th {}, "email"
         th {}, "id"
-        th {}, "folderCount"
       tr {className: "info"},
         td {}, @props.email
         td {}, @props.id
-        td {}, @props.folderCount
+
+BatchForm = React.createClass
+  updateEmail: (e) ->
+    @props.transactions.updateEmail(e.target.value)
+
+  render: ->
+    form {role: "form", className: "form-horizontal"},
+      span {className: "help-text"}, @props.form.error
+
+      div {className: "form-group"},
+        label {className: "control-label col-xs-2"}, "email"
+        div {className: "col-xs-10"},
+          input
+            className: "form-control"
+            onChange: @updateEmail
+            value: @props.form.email
 
 module.exports = React.createClass
 
@@ -63,20 +76,15 @@ module.exports = React.createClass
             form: @props.appState.forms.token
 
           if @props.appState.user.id
-            div {className: "form-container"},
-              UserInfo
-                email: @props.appState.user.email
-                id: @props.appState.user.id
-                folderCount: @props.appState.user.folders.length
-
-              form {role: "form", className: "form-horizontal"},
-                span {className: "help-text"}, @props.appState.forms.batch.error
-
-                div {className: "form-group"},
-                  label {className: "control-label col-xs-2"}, "email"
-                  div {className: "col-xs-10"},
-                    input {
-                      className: "form-control",
-                      onChange: @updateEmail,
-                      value: @props.appState.user.email
-                    }
+            div {className: "row"},
+              div {className: "col-xs-10 col-xs-offset-2"},
+                UserInfo
+                  email: @props.appState.user.email
+                  id: @props.appState.user.id
+              div {className: "col-xs-12"},
+                BatchForm
+                  transactions:
+                    updateEmail: @props.transactions.updateEmail
+                  remotes:
+                    sendBatchRequest: @props.remotes.sendBatchRequest
+                  form: @props.appState.forms.batch

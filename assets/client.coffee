@@ -50,7 +50,7 @@ transactions =
     appState.forms[formName]?.inFlight = false
 
   updateEmail: (email) ->
-    appState.user.email = email
+    appState.forms.batch.email = email
 
   displayErrorFor: (formName, msg) ->
     appState.forms[formName]?.error= msg
@@ -118,6 +118,9 @@ remotes =
       .fail((xhr) ->
         alert("Folders could not be loaded!")
       )
+
+  sendBatchRequest: ->
+    alert("Batch request sent.  IMPLEMENT!")
 
 #END Network calls
 
