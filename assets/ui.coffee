@@ -63,19 +63,20 @@ module.exports = React.createClass
             form: @props.appState.forms.token
 
           if @props.appState.user.id
-            form {role: "form", className: "form-horizontal"},
+            div {className: "form-container"},
               UserInfo
                 email: @props.appState.user.email
                 id: @props.appState.user.id
                 folderCount: @props.appState.user.folders.length
 
-              span {className: "help-text"}, @props.appState.forms.batch.error
+              form {role: "form", className: "form-horizontal"},
+                span {className: "help-text"}, @props.appState.forms.batch.error
 
-              div {className: "form-group"},
-                label {className: "control-label col-xs-2"}, "email"
-                div {className: "col-xs-10"},
-                  input {
-                    className: "form-control",
-                    onChange: @updateEmail,
-                    value: @props.appState.user.email
-                  }
+                div {className: "form-group"},
+                  label {className: "control-label col-xs-2"}, "email"
+                  div {className: "col-xs-10"},
+                    input {
+                      className: "form-control",
+                      onChange: @updateEmail,
+                      value: @props.appState.user.email
+                    }

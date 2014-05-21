@@ -200,9 +200,9 @@ UserInfo = React.createClass({
       className: "table table-hover"
     }, tr({
       className: "active"
-    }, th({}, "email"), th({}, "id"), th({}, "folderCount")), tr({
+    }, th("email"), th("id"), th("folderCount")), tr({
       className: "info"
-    }, td({}, this.props.email), td({}, this.props.id), td({}, this.props.folderCount)));
+    }, td(this.props.email), td(this.props.id), td(this.props.folderCount)));
   }
 });
 
@@ -226,14 +226,16 @@ module.exports = React.createClass({
         fetchFolders: this.props.remotes.fetchFolders
       },
       form: this.props.appState.forms.token
-    }), this.props.appState.user.id ? form({
-      role: "form",
-      className: "form-horizontal"
+    }), this.props.appState.user.id ? div({
+      className: "form-container"
     }, UserInfo({
       email: this.props.appState.user.email,
       id: this.props.appState.user.id,
       folderCount: this.props.appState.user.folders.length
-    }), span({
+    }), form({
+      role: "form",
+      className: "form-horizontal"
+    }, span({
       className: "help-text"
     }, this.props.appState.forms.batch.error), div({
       className: "form-group"
@@ -245,7 +247,7 @@ module.exports = React.createClass({
       className: "form-control",
       onChange: this.updateEmail,
       value: this.props.appState.user.email
-    })))) : void 0)));
+    }))))) : void 0)));
   }
 });
 
