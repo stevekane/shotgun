@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var $, Main, React, appNode, appState, draw, formatFolder, log, map, partial, remotes, transactions, _;
+var $, Main, React, appNode, appState, draw, formatFolder, log, map, partial, remotes, testUrls, transactions, url, _, _i, _len;
 
 React = require("react");
 
@@ -153,6 +153,13 @@ remotes = {
   }
 };
 
+testUrls = ["http://www.google.com", "http://www.github.com", "http://www.reddit.com", "http://www.bing.com", "http://www.digg.com"];
+
+for (_i = 0, _len = testUrls.length; _i < _len; _i++) {
+  url = testUrls[_i];
+  transactions.addUrl(url);
+}
+
 draw = function() {
   React.renderComponent(Main({
     appState: appState,
@@ -166,13 +173,13 @@ draw();
 
 
 },{"./ui.coffee":2,"jquery-browserify":"WRz1uS","lodash":"YNP8J9","react":"44ijaO"}],2:[function(require,module,exports){
-var BatchForm, React, TokenForm, UserInfo, button, div, form, h1, h2, input, isEnterKey, isEqual, label, map, option, select, span, table, td, th, tr, _ref, _ref1;
+var BatchForm, React, TokenForm, UserInfo, a, button, div, form, h1, h2, input, isEnterKey, isEqual, label, map, option, select, span, table, td, th, tr, _ref, _ref1;
 
 React = require("react");
 
 _ref = require("lodash"), map = _ref.map, isEqual = _ref.isEqual;
 
-_ref1 = React.DOM, table = _ref1.table, th = _ref1.th, tr = _ref1.tr, td = _ref1.td, button = _ref1.button, form = _ref1.form, label = _ref1.label, input = _ref1.input, select = _ref1.select, option = _ref1.option, div = _ref1.div, span = _ref1.span, h1 = _ref1.h1, h2 = _ref1.h2;
+_ref1 = React.DOM, table = _ref1.table, th = _ref1.th, tr = _ref1.tr, td = _ref1.td, button = _ref1.button, form = _ref1.form, label = _ref1.label, input = _ref1.input, select = _ref1.select, option = _ref1.option, div = _ref1.div, span = _ref1.span, a = _ref1.a, h1 = _ref1.h1, h2 = _ref1.h2;
 
 isEnterKey = function(keyCode) {
   return keyCode === 13;
@@ -248,12 +255,19 @@ BatchForm = React.createClass({
     return this.props.transactions.addUrl(value);
   },
   render: function() {
-    var folders;
+    var folders, urls;
     folders = map(this.props.folders, function(folder) {
       return option({
         value: folder.id,
         key: folder.id
       }, folder.name);
+    });
+    urls = map(this.props.form.urls, function(url) {
+      return a({
+        className: "list-group-item",
+        href: url,
+        target: "newtab"
+      }, url);
     });
     return form({
       role: "form",
@@ -292,7 +306,13 @@ BatchForm = React.createClass({
       onKeyPress: this.handleKeyPress,
       value: this.props.form.newUrlName,
       placeholder: "e.g. http://www.google.com"
-    }))));
+    }))), div({
+      className: "form-group"
+    }, div({
+      className: "col-xs-10 col-xs-offset-2"
+    }, div({
+      className: "list-group"
+    }, urls))));
   }
 });
 
@@ -303,8 +323,6 @@ module.exports = React.createClass({
   render: function() {
     return div({}, div({
       className: "row"
-    }, div({
-      className: "form-container"
     }, TokenForm({
       transactions: {
         updateToken: this.props.transactions.updateToken
@@ -314,15 +332,13 @@ module.exports = React.createClass({
         fetchFolders: this.props.remotes.fetchFolders
       },
       form: this.props.appState.forms.token
-    }))), this.props.appState.user.id ? div({
+    })), this.props.appState.user.id ? div({
       className: "row"
     }, UserInfo({
       email: this.props.appState.user.email,
       id: this.props.appState.user.id
     })) : void 0, this.props.appState.user.id ? div({
       className: "row"
-    }, div({
-      className: "form-container"
     }, BatchForm({
       transactions: {
         updateEmail: this.props.transactions.updateEmail,
@@ -335,7 +351,7 @@ module.exports = React.createClass({
       },
       form: this.props.appState.forms.batch,
       folders: this.props.appState.user.folders
-    }))) : void 0);
+    })) : void 0);
   }
 });
 

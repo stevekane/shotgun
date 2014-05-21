@@ -137,6 +137,18 @@ remotes =
 
 #END Network calls
 
+#FOR TESTING PURPOSES
+testUrls = [
+  "http://www.google.com",
+  "http://www.github.com",
+  "http://www.reddit.com",
+  "http://www.bing.com",
+  "http://www.digg.com"
+]
+
+transactions.addUrl(url) for url in testUrls
+#END TESTING
+
 draw = ->
   React.renderComponent(Main({
     appState: appState
