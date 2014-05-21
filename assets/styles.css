@@ -15,9 +15,17 @@ body {
 .form-container {
   background-color: gray;
   padding: 10px;
-  margin: 10px 0px;
+}
+
+table {
+  margin: 10px 0px !important;
 }
 
 td, th {
+  text-align: left;
   color: black;
+}
+
+th {
+  font-weight: bold;
 }

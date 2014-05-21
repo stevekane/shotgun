@@ -105,8 +105,8 @@ module.exports = React.createClass
     isEqual(next, @props)
 
   render: ->
-    div {className: "row"},
-      div {className: "col-xs-12"},
+    div {},
+      div {className: "row"},
         div {className: "form-container"},
           TokenForm
             transactions:
@@ -117,21 +117,21 @@ module.exports = React.createClass
             form: @props.appState.forms.token
 
       if @props.appState.user.id
-        div {className: "col-xs-12"},
+        div {className: "row"},
+          UserInfo
+            email: @props.appState.user.email
+            id: @props.appState.user.id
+
+      if @props.appState.user.id
+        div {className: "row"},
           div {className: "form-container"},
-              div {className: "row"},
-                div {className: "col-xs-10 col-xs-offset-2"},
-                  UserInfo
-                    email: @props.appState.user.email
-                    id: @props.appState.user.id
-                div {className: "col-xs-12"},
-                  BatchForm
-                    transactions:
-                      updateEmail: @props.transactions.updateEmail
-                      updateFolderId: @props.transactions.updateFolderId
-                      updateNewUrlName: @props.transactions.updateNewUrlName
-                      addUrl: @props.transactions.addUrl
-                    remotes:
-                      sendBatchRequest: @props.remotes.sendBatchRequest
-                    form: @props.appState.forms.batch
-                    folders: @props.appState.user.folders
+            BatchForm
+              transactions:
+                updateEmail: @props.transactions.updateEmail
+                updateFolderId: @props.transactions.updateFolderId
+                updateNewUrlName: @props.transactions.updateNewUrlName
+                addUrl: @props.transactions.addUrl
+              remotes:
+                sendBatchRequest: @props.remotes.sendBatchRequest
+              form: @props.appState.forms.batch
+              folders: @props.appState.user.folders

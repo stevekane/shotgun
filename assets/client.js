@@ -301,10 +301,8 @@ module.exports = React.createClass({
     return isEqual(next, this.props);
   },
   render: function() {
-    return div({
+    return div({}, div({
       className: "row"
-    }, div({
-      className: "col-xs-12"
     }, div({
       className: "form-container"
     }, TokenForm({
@@ -317,18 +315,14 @@ module.exports = React.createClass({
       },
       form: this.props.appState.forms.token
     }))), this.props.appState.user.id ? div({
-      className: "col-xs-12"
-    }, div({
-      className: "form-container"
-    }, div({
       className: "row"
-    }, div({
-      className: "col-xs-10 col-xs-offset-2"
     }, UserInfo({
       email: this.props.appState.user.email,
       id: this.props.appState.user.id
-    })), div({
-      className: "col-xs-12"
+    })) : void 0, this.props.appState.user.id ? div({
+      className: "row"
+    }, div({
+      className: "form-container"
     }, BatchForm({
       transactions: {
         updateEmail: this.props.transactions.updateEmail,
@@ -341,7 +335,7 @@ module.exports = React.createClass({
       },
       form: this.props.appState.forms.batch,
       folders: this.props.appState.user.folders
-    }))))) : void 0);
+    }))) : void 0);
   }
 });
 
