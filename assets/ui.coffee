@@ -1,6 +1,6 @@
 React = require "react"
-{map, isEqual} = require "lodash"
-{table, th, tr, td, button, form, label, input, select, option, div, span, a, h1, h2} = React.DOM
+{map, partial, isEqual} = require "lodash"
+{table, th, tr, td, ul, li, button, form, label, input, select, option, div, span, a, h1, h2} = React.DOM
 
 isEnterKey = (keyCode) -> keyCode is 13
 
@@ -66,12 +66,20 @@ BatchForm = React.createClass
     @props.transactions.addUrl(value)
 
   render: ->
+    removeUrl = @props.transactions.removeUrl
+
     folders = map @props.folders, (folder) ->
       option {value: folder.id, key: folder.id}, folder.name
 
     urls = map @props.form.urls, ({href, id}) ->
-      a {className: "list-group-item", href: href, key: id, target: "newtab"},
-      href
+      removeSelf = (e) ->
+        e.preventDefault()
+        removeUrl(id)
+
+      li {className: "row", href: href, key: id, target: "newtab"},
+        div {className: "col-xs-2"},
+          button {className: "btn btn-xs btn-danger", onClick: removeSelf}, "remove"
+        div {className: "col-xs-10"}, href
 
     form {role: "form", className: "form-horizontal"},
       div {className: "form-group"},
@@ -103,8 +111,7 @@ BatchForm = React.createClass
           span {className: "help-text"}, @props.form.error
 
       div {className: "form-group"},
-        div {className: "col-xs-10 col-xs-offset-2"},
-          div {className: "list-group"}, urls
+        ul {}, urls
         
 
 module.exports = React.createClass
@@ -137,6 +144,7 @@ module.exports = React.createClass
               updateFolderId: @props.transactions.updateFolderId
               updateNewUrlName: @props.transactions.updateNewUrlName
               addUrl: @props.transactions.addUrl
+              removeUrl: @props.transactions.removeUrl
             remotes:
               sendBatchRequest: @props.remotes.sendBatchRequest
             form: @props.appState.forms.batch

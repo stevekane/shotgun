@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var $, Main, React, Url, appNode, appState, draw, formatFolder, log, map, parseUrl, partial, remotes, testUrls, transactions, url, uuid, _, _i, _len;
+var $, Folder, Main, React, Url, appNode, appState, draw, log, map, parseUrl, partial, remotes, remove, testUrls, transactions, url, uuid, _, _i, _len;
 
 parseUrl = require("url").parse;
 
@@ -11,7 +11,7 @@ $ = require("jquery-browserify");
 
 uuid = require("node-uuid");
 
-partial = _.partial, map = _.map;
+partial = _.partial, map = _.map, remove = _.remove;
 
 Main = require("./ui.coffee");
 
@@ -32,6 +32,16 @@ Url = function(href) {
   return {
     href: href,
     id: uuid.v4()
+  };
+};
+
+Folder = function(_arg) {
+  var folder_ids, folder_name, id;
+  id = _arg.id, folder_ids = _arg.folder_ids, folder_name = _arg.folder_name;
+  return {
+    id: id,
+    name: folder_name,
+    childFolders: folder_ids
   };
 };
 
@@ -98,6 +108,12 @@ transactions = {
       }), 4000);
     }
   },
+  removeUrl: function(id) {
+    console.log(id);
+    return remove(appState.forms.batch.urls, {
+      id: id
+    });
+  },
   displayErrorFor: function(formName, msg) {
     var _ref;
     return (_ref = appState.forms[formName]) != null ? _ref.error = msg : void 0;
@@ -106,15 +122,6 @@ transactions = {
     var _ref;
     return (_ref = appState.forms[formName]) != null ? _ref.error = "" : void 0;
   }
-};
-
-formatFolder = function(_arg) {
-  var folder_name, id;
-  id = _arg.id, folder_name = _arg.folder_name;
-  return {
-    id: id,
-    name: folder_name
-  };
 };
 
 remotes = {
@@ -162,7 +169,7 @@ remotes = {
         },
         json: true
       }).done(function(folders) {
-        return transactions.updateFolders(map(folders, formatFolder));
+        return transactions.updateFolders(map(folders, Folder));
       }).fail(function(xhr) {
         return alert("Folders could not be loaded!");
       });
@@ -193,13 +200,13 @@ draw();
 
 
 },{"./ui.coffee":2,"jquery-browserify":"WRz1uS","lodash":"YNP8J9","node-uuid":3,"react":"44ijaO","url":17}],2:[function(require,module,exports){
-var BatchForm, React, TokenForm, UserInfo, a, button, div, form, h1, h2, input, isEnterKey, isEqual, label, map, option, select, span, table, td, th, tr, _ref, _ref1;
+var BatchForm, React, TokenForm, UserInfo, a, button, div, form, h1, h2, input, isEnterKey, isEqual, label, li, map, option, partial, select, span, table, td, th, tr, ul, _ref, _ref1;
 
 React = require("react");
 
-_ref = require("lodash"), map = _ref.map, isEqual = _ref.isEqual;
+_ref = require("lodash"), map = _ref.map, partial = _ref.partial, isEqual = _ref.isEqual;
 
-_ref1 = React.DOM, table = _ref1.table, th = _ref1.th, tr = _ref1.tr, td = _ref1.td, button = _ref1.button, form = _ref1.form, label = _ref1.label, input = _ref1.input, select = _ref1.select, option = _ref1.option, div = _ref1.div, span = _ref1.span, a = _ref1.a, h1 = _ref1.h1, h2 = _ref1.h2;
+_ref1 = React.DOM, table = _ref1.table, th = _ref1.th, tr = _ref1.tr, td = _ref1.td, ul = _ref1.ul, li = _ref1.li, button = _ref1.button, form = _ref1.form, label = _ref1.label, input = _ref1.input, select = _ref1.select, option = _ref1.option, div = _ref1.div, span = _ref1.span, a = _ref1.a, h1 = _ref1.h1, h2 = _ref1.h2;
 
 isEnterKey = function(keyCode) {
   return keyCode === 13;
@@ -275,7 +282,8 @@ BatchForm = React.createClass({
     return this.props.transactions.addUrl(value);
   },
   render: function() {
-    var folders, urls;
+    var folders, removeUrl, urls;
+    removeUrl = this.props.transactions.removeUrl;
     folders = map(this.props.folders, function(folder) {
       return option({
         value: folder.id,
@@ -283,14 +291,25 @@ BatchForm = React.createClass({
       }, folder.name);
     });
     urls = map(this.props.form.urls, function(_arg) {
-      var href, id;
+      var href, id, removeSelf;
       href = _arg.href, id = _arg.id;
-      return a({
-        className: "list-group-item",
+      removeSelf = function(e) {
+        e.preventDefault();
+        return removeUrl(id);
+      };
+      return li({
+        className: "row",
         href: href,
         key: id,
         target: "newtab"
-      }, href);
+      }, div({
+        className: "col-xs-2"
+      }, button({
+        className: "btn btn-xs btn-danger",
+        onClick: removeSelf
+      }, "remove")), div({
+        className: "col-xs-10"
+      }, href));
     });
     return form({
       role: "form",
@@ -331,11 +350,7 @@ BatchForm = React.createClass({
       className: "help-text"
     }, this.props.form.error))), div({
       className: "form-group"
-    }, div({
-      className: "col-xs-10 col-xs-offset-2"
-    }, div({
-      className: "list-group"
-    }, urls))));
+    }, ul({}, urls)));
   }
 });
 
@@ -367,7 +382,8 @@ module.exports = React.createClass({
         updateEmail: this.props.transactions.updateEmail,
         updateFolderId: this.props.transactions.updateFolderId,
         updateNewUrlName: this.props.transactions.updateNewUrlName,
-        addUrl: this.props.transactions.addUrl
+        addUrl: this.props.transactions.addUrl,
+        removeUrl: this.props.transactions.removeUrl
       },
       remotes: {
         sendBatchRequest: this.props.remotes.sendBatchRequest

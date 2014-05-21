@@ -24,3 +24,11 @@ td, th {
 th {
   font-weight: bold;
 }
+
+ul {
+  list-style-type: none;
+}
+
+li {
+  margin: 4px;
+}

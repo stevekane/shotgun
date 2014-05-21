@@ -3,7 +3,7 @@ React = require "react"
 _ = require "lodash"
 $ = require "jquery-browserify"
 uuid = require "node-uuid"
-{partial, map} = _
+{partial, map, remove} = _
 Main = require "./ui.coffee"
 appNode = document.getElementById("app")
 log = (obj) -> console.log(JSON.stringify(obj, null ,2))
@@ -20,8 +20,12 @@ Url = (href) ->
   href: href
   id: uuid.v4()
 
-#END Struct defs
+Folder = ({id, folder_ids, folder_name}) ->
+  id: id
+  name: folder_name
+  childFolders: folder_ids
 
+#END Struct defs
 
 appState =
   forms:
@@ -72,11 +76,15 @@ transactions =
 
   addUrl: (href) ->
     {protocol} = parseUrl(href)
+
     if (protocol)
       appState.forms.batch.urls.push(Url(href))
     else
       appState.forms.batch.error = "Must provide a protocol.  e.g. http"
       setTimeout((-> appState.forms.batch.error = ""), 4000)
+
+  removeUrl: (id) ->
+    remove(appState.forms.batch.urls, id: id)
 
   displayErrorFor: (formName, msg) ->
     appState.forms[formName]?.error= msg
@@ -85,14 +93,6 @@ transactions =
     appState.forms[formName]?.error = ""
 
 #END transactions
-
-#START functional helpers
-
-formatFolder = ({id, folder_name}) ->
-  id: id
-  name: folder_name
-
-#END functional helpers
 
 #START Network calls
 
@@ -142,7 +142,7 @@ remotes =
         json: true
       })
       .done((folders) ->
-        transactions.updateFolders(map(folders, formatFolder))
+        transactions.updateFolders(map(folders, Folder))
       )
       .fail((xhr) ->
         alert("Folders could not be loaded!")
