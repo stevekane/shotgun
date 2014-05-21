@@ -59,6 +59,9 @@ transactions =
   updateNewUrlName: (name) ->
     appState.forms.batch.newUrlName = name
 
+  addUrl: (name) ->
+    appState.forms.batch.urls.push(name)
+
   displayErrorFor: (formName, msg) ->
     appState.forms[formName]?.error= msg
 

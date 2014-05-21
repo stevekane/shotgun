@@ -75,6 +75,9 @@ transactions = {
   updateNewUrlName: function(name) {
     return appState.forms.batch.newUrlName = name;
   },
+  addUrl: function(name) {
+    return appState.forms.batch.urls.push(name);
+  },
   displayErrorFor: function(formName, msg) {
     var _ref;
     return (_ref = appState.forms[formName]) != null ? _ref.error = msg : void 0;
@@ -163,13 +166,17 @@ draw();
 
 
 },{"./ui.coffee":2,"jquery-browserify":"WRz1uS","lodash":"YNP8J9","react":"44ijaO"}],2:[function(require,module,exports){
-var BatchForm, React, TokenForm, UserInfo, button, div, form, h1, h2, input, isEqual, label, map, option, select, span, table, td, th, tr, _ref, _ref1;
+var BatchForm, React, TokenForm, UserInfo, button, div, form, h1, h2, input, isEnterKey, isEqual, label, map, option, select, span, table, td, th, tr, _ref, _ref1;
 
 React = require("react");
 
 _ref = require("lodash"), map = _ref.map, isEqual = _ref.isEqual;
 
 _ref1 = React.DOM, table = _ref1.table, th = _ref1.th, tr = _ref1.tr, td = _ref1.td, button = _ref1.button, form = _ref1.form, label = _ref1.label, input = _ref1.input, select = _ref1.select, option = _ref1.option, div = _ref1.div, span = _ref1.span, h1 = _ref1.h1, h2 = _ref1.h2;
+
+isEnterKey = function(keyCode) {
+  return keyCode === 13;
+};
 
 TokenForm = React.createClass({
   updateToken: function(e) {
@@ -222,13 +229,32 @@ UserInfo = React.createClass({
 });
 
 BatchForm = React.createClass({
-  updateEmail: function(e, val) {
+  updateEmail: function(e) {
     return this.props.transactions.updateEmail(e.target.value);
   },
-  updateFolderId: function(e, val) {
+  updateFolderId: function(e) {
     return this.props.transactions.updateFolderId(e.target.value);
   },
+  updateNewUrlName: function(e) {
+    return this.props.transactions.updateNewUrlName(e.target.value);
+  },
+  handleKeyPress: function(e) {
+    if (isEnterKey(e.keyCode)) {
+      e.preventDefault();
+      return this.addUrl(e.target.value);
+    }
+  },
+  addUrl: function(value) {
+    return this.props.transactions.addUrl(value);
+  },
   render: function() {
+    var folders;
+    folders = map(this.props.folders, function(folder) {
+      return option({
+        value: folder.id,
+        key: folder.id
+      }, folder.name);
+    });
     return form({
       role: "form",
       className: "form-horizontal"
@@ -254,12 +280,19 @@ BatchForm = React.createClass({
       className: "form-control",
       onChange: this.updateFolderId,
       value: this.props.form.folderId
-    }, map(this.props.folders, function(folder) {
-      return option({
-        value: folder.id,
-        key: folder.id
-      }, folder.name);
-    })))));
+    }, folders))), div({
+      className: "form-group"
+    }, label({
+      className: "control-label col-xs-2"
+    }, "add a url"), div({
+      className: "col-xs-10"
+    }, input({
+      className: "form-control",
+      onChange: this.updateNewUrlName,
+      onKeyPress: this.handleKeyPress,
+      value: this.props.form.newUrlName,
+      placeholder: "e.g. http://www.google.com"
+    }))));
   }
 });
 
@@ -283,7 +316,11 @@ module.exports = React.createClass({
         fetchFolders: this.props.remotes.fetchFolders
       },
       form: this.props.appState.forms.token
-    }), this.props.appState.user.id ? div({
+    }))), this.props.appState.user.id ? div({
+      className: "col-xs-12"
+    }, div({
+      className: "form-container"
+    }, div({
       className: "row"
     }, div({
       className: "col-xs-10 col-xs-offset-2"
@@ -295,14 +332,16 @@ module.exports = React.createClass({
     }, BatchForm({
       transactions: {
         updateEmail: this.props.transactions.updateEmail,
-        updateFolderId: this.props.transactions.updateFolderId
+        updateFolderId: this.props.transactions.updateFolderId,
+        updateNewUrlName: this.props.transactions.updateNewUrlName,
+        addUrl: this.props.transactions.addUrl
       },
       remotes: {
         sendBatchRequest: this.props.remotes.sendBatchRequest
       },
       form: this.props.appState.forms.batch,
       folders: this.props.appState.user.folders
-    }))) : void 0)));
+    }))))) : void 0);
   }
 });
 
