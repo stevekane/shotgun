@@ -96,7 +96,10 @@ remotes =
           token: token
         json: true
       })
-      .done(transactions.updateUser)
+      .done((user) ->
+        transactions.updateUser(user)
+        transactions.updateEmail(user.email)
+      )
       .fail((xhr) ->
         displayError(xhr.statusText)
         setTimeout(clearError, 4000)

@@ -52,7 +52,6 @@ BatchForm = React.createClass
   updateFolderId: (e, val) ->
     @props.transactions.updateFolderId(e.target.value)
 
-
   render: ->
     form {role: "form", className: "form-horizontal"},
       span {className: "help-text"}, @props.form.error

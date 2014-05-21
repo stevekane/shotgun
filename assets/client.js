@@ -113,7 +113,10 @@ remotes = {
           token: token
         },
         json: true
-      }).done(transactions.updateUser).fail(function(xhr) {
+      }).done(function(user) {
+        transactions.updateUser(user);
+        return transactions.updateEmail(user.email);
+      }).fail(function(xhr) {
         displayError(xhr.statusText);
         return setTimeout(clearError, 4000);
       }).always(unlock);
@@ -220,11 +223,9 @@ UserInfo = React.createClass({
 
 BatchForm = React.createClass({
   updateEmail: function(e, val) {
-    console.log(val);
     return this.props.transactions.updateEmail(e.target.value);
   },
   updateFolderId: function(e, val) {
-    console.log(val);
     return this.props.transactions.updateFolderId(e.target.value);
   },
   render: function() {
