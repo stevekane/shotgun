@@ -25,6 +25,12 @@ Folder = ({id, folder_ids, folder_name}) ->
   name: folder_name
   childFolders: folder_ids
 
+Job = (user, folderId, urls) ->
+  user: user
+  folderId: folderId
+  urls: urls
+  uuid: uuid.v4()
+
 #END Struct defs
 
 appState =
@@ -148,8 +154,12 @@ remotes =
         alert("Folders could not be loaded!")
       )
 
-  sendBatchRequest: ->
-    alert("Batch request sent.  IMPLEMENT!")
+  sendJob: ->
+    job = Job
+      user: appState.user.id
+      folderId: appState.forms.batch.folderId
+      urls: appState.forms.batch.urls
+    log(job)
 
 #END Network calls
 

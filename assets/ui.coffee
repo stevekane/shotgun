@@ -65,6 +65,10 @@ BatchForm = React.createClass
   addUrl: (value) ->
     @props.transactions.addUrl(value)
 
+  submit: (e) ->
+    e.preventDefault()
+    @props.remotes.sendJob()
+
   render: ->
     removeUrl = @props.transactions.removeUrl
 
@@ -82,6 +86,14 @@ BatchForm = React.createClass
         div {className: "col-xs-10"}, href
 
     form {role: "form", className: "form-horizontal"},
+      div {className: "form-group"},
+        div({className: "col-xs-10 col-xs-offset-2"},
+          button {
+            className: "btn btn-info"
+            onClick: @submit
+            disabled: @props.form.inFlight
+          }, "send urls")
+
       div {className: "form-group"},
         label {className: "control-label col-xs-2"}, "email"
         div {className: "col-xs-10"},
@@ -146,6 +158,6 @@ module.exports = React.createClass
               addUrl: @props.transactions.addUrl
               removeUrl: @props.transactions.removeUrl
             remotes:
-              sendBatchRequest: @props.remotes.sendBatchRequest
+              sendJob: @props.remotes.sendJob
             form: @props.appState.forms.batch
             folders: @props.appState.user.folders

@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var $, Folder, Main, React, Url, appNode, appState, draw, log, map, parseUrl, partial, remotes, remove, testUrls, transactions, url, uuid, _, _i, _len;
+var $, Folder, Job, Main, React, Url, appNode, appState, draw, log, map, parseUrl, partial, remotes, remove, testUrls, transactions, url, uuid, _, _i, _len;
 
 parseUrl = require("url").parse;
 
@@ -42,6 +42,15 @@ Folder = function(_arg) {
     id: id,
     name: folder_name,
     childFolders: folder_ids
+  };
+};
+
+Job = function(user, folderId, urls) {
+  return {
+    user: user,
+    folderId: folderId,
+    urls: urls,
+    uuid: uuid.v4()
   };
 };
 
@@ -109,7 +118,6 @@ transactions = {
     }
   },
   removeUrl: function(id) {
-    console.log(id);
     return remove(appState.forms.batch.urls, {
       id: id
     });
@@ -175,8 +183,14 @@ remotes = {
       });
     }
   },
-  sendBatchRequest: function() {
-    return alert("Batch request sent.  IMPLEMENT!");
+  sendJob: function() {
+    var job;
+    job = Job({
+      user: appState.user.id,
+      folderId: appState.forms.batch.folderId,
+      urls: appState.forms.batch.urls
+    });
+    return log(job);
   }
 };
 
@@ -281,6 +295,10 @@ BatchForm = React.createClass({
   addUrl: function(value) {
     return this.props.transactions.addUrl(value);
   },
+  submit: function(e) {
+    e.preventDefault();
+    return this.props.remotes.sendJob();
+  },
   render: function() {
     var folders, removeUrl, urls;
     removeUrl = this.props.transactions.removeUrl;
@@ -315,6 +333,14 @@ BatchForm = React.createClass({
       role: "form",
       className: "form-horizontal"
     }, div({
+      className: "form-group"
+    }, div({
+      className: "col-xs-10 col-xs-offset-2"
+    }, button({
+      className: "btn btn-info",
+      onClick: this.submit,
+      disabled: this.props.form.inFlight
+    }, "send urls"))), div({
       className: "form-group"
     }, label({
       className: "control-label col-xs-2"
@@ -386,7 +412,7 @@ module.exports = React.createClass({
         removeUrl: this.props.transactions.removeUrl
       },
       remotes: {
-        sendBatchRequest: this.props.remotes.sendBatchRequest
+        sendJob: this.props.remotes.sendJob
       },
       form: this.props.appState.forms.batch,
       folders: this.props.appState.user.folders
