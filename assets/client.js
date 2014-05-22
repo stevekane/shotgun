@@ -184,13 +184,26 @@ remotes = {
     }
   },
   sendJob: function() {
-    var job;
+    var job, url;
+    url = "http://localhost:8080/capture";
     job = Job({
       user: appState.user.id,
       folderId: appState.forms.batch.folderId,
       urls: appState.forms.batch.urls
     });
-    return log(job);
+    log(job);
+    return $.ajax({
+      type: "POST",
+      dataType: "json",
+      url: url,
+      data: job,
+      json: true
+    }).done(function(message) {
+      return alert(message);
+    }).fail(function(xhr) {
+      console.log(xhr);
+      return alert("Job rejected!");
+    });
   }
 };
 

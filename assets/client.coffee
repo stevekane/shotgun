@@ -155,11 +155,27 @@ remotes =
       )
 
   sendJob: ->
+    url = "http://localhost:8080/capture"
     job = Job
       user: appState.user.id
       folderId: appState.forms.batch.folderId
       urls: appState.forms.batch.urls
     log(job)
+
+    $.ajax({
+      type: "POST"
+      dataType: "json"
+      url: url
+      data: job
+      json: true
+    })
+    .done((message) ->
+      alert(message)
+    )
+    .fail((xhr) ->
+      console.log(xhr)
+      alert("Job rejected!")
+    )
 
 #END Network calls
 

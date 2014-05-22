@@ -34,7 +34,7 @@ var getServerIp = pvApi.getServerIp;
 
 //configure routes w/ instance of queue and server
 var setupRoutes = function (queue, mailer, server) {
-  server.post("/process", function (req, res, next) {
+  server.post("/capture", function (req, res, next) {
     var urls = req.body.urls;
     var folderId = req.body.folderId;
     var user = req.body.user;
