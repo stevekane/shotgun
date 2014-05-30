@@ -61,6 +61,10 @@ module.exports = function (options) {
         }, options.RENDER_DELAY || 2000); 
 
       });
+    }, {
+      dnodeOpts: {
+        weak: false
+      }  
     }); 
   };
 
