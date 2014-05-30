@@ -26,10 +26,8 @@ var options = {
 };
 
 var capture = require("./services/image-capturing")(options);
-var process = require("./services/image-processing")(options);
 var pvApi = require("./services/pv-api")(options);
 var capturePage = capture.capturePage;
-var processSnapshot = process.processSnapshot;
 var getServerIp = pvApi.getServerIp;
 
 //configure routes w/ instance of queue and server
@@ -91,13 +89,9 @@ var processUrl = function (phantom, job, url, cb) {
         FolderId: job.folderId 
       });
 
-      processSnapshot(newPayload, function (err, res) {
-        console.log(newPayload);
-        cb(null, {
-          url: url,
-          status: err ? "failed" : "succeeded"
-        }); 
-      });
+      console.log(err);
+      console.log(newPayload);
+      cb(null, newPayload);
     });
   });
 };
