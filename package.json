@@ -23,8 +23,6 @@
   },
   "homepage": "https://github.com/stevekane/shotgun",
   "dependencies": {
-    "webshot": "^0.13.0",
-    "phantomjs": "^1.9.7-5",
     "async": "^0.8.0",
     "restify": "^2.7.0",
     "moment": "^2.6.0",
@@ -37,14 +35,11 @@
     "request": "^2.34.0",
     "tape": "^2.12.3",
     "nodemailer": "^0.6.3",
-    "zlib": "^1.0.5",
-    "through": "^2.3.4",
-    "hyperquest": "^0.3.0",
-    "aws-sdk": "^2.0.0-rc.17",
     "coffeeify": "^0.6.0",
-    "reactify": "^0.13.1",
-    "envify": "^1.2.1",
     "react": "^0.10.0",
     "jquery-browserify": "^1.8.1"
+  },
+  "devDependencies": {
+    "tape": "^2.13.1"
   }
 }
