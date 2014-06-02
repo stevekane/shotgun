@@ -6,53 +6,34 @@ var dns = require("dns")
   , _ = require("lodash")
   , partial = _.partial
   , extend = _.extend
+  , Job = require("./types/Job")
+  , Snapshot = require("./types/Snapshot")
+  , PageResult = require("./types/PageResult")
+  , options = require("./config.json");
 
-var options = {
-  "TAB_COUNT": 20,
-  "PHANTOM_COUNT": 4,
-  "RENDER_DELAY": 200,
-  "DEBUG": false,
-  "viewportSize": {
-    width: 1200,
-    height: 800 
-  },
-  "MAIL_CONFIG": {
-    service: "Gmail",
-    auth: {
-      user: "testmailpv83@gmail.com",
-      pass: "pagevault"
-    }
-  }
-};
-
-var capture = require("./services/image-capturing")(options);
-var pvApi = require("./services/pv-api")(options);
-var capturePage = capture.capturePage;
+var cap = require("./services/image-capturing")(options.phantom);
+var proc = require("./services/image-processing")(options.processor);
+var pvApi = require("./services/pv-api")(options.api);
+var capturePage = cap.capturePage;
+var processSnapshot = proc.processSnapshot;
 var getServerIp = pvApi.getServerIp;
 
 //configure routes w/ instance of queue and server
 var setupRoutes = function (queue, mailer, server) {
   server.post("/capture", function (req, res, next) {
-    var urls = req.body.urls;
-    var folderId = req.body.folderId;
-    var user = req.body.user;
-    var validReq = urls && folderId && user;
-    var goodReqText = "Your job is processing.";
-    var badReqText = "Please supply urls, folderId, and user.";
-    var job = {
-      folderId: folderId,
-      user: user,
-      urls: urls
+    var validReq = req.body.urls && req.body.folderId && req.body.userId;
+    var status = validReq ? 200 : 400;
+    var message = validReq 
+      ? "Your job is processing" 
+      : "Please supply urls, folderId, and userId";
+    var onJobComplete = function (err, results) {
+      console.log("Imagine this was emailed to you");
+      console.log(results);   
     };
 
-    if (!validReq) {
-      return res.send(400, badReqText);
-    } else {
-      queue.push(job, function () {
-        console.log("job completed"); 
-      });
-      return res.send(200, goodReqText);
-    }
+    if (validReq) queue.push(Job(req.body), onJobComplete);
+    
+    res.send(status, message);
   });
 };
 
@@ -65,34 +46,24 @@ var fetchIpForUrl = function (url, cb) {
   });
 };
 
-//fetch IP for PageVault Server and IP for url
-var addIps = function (payload, cb) {
-  async.parallel({
-    PageVaultServerIp: getServerIp,
-    CaptureWebsiteIp: partial(fetchIpForUrl, payload.ServerUrl)
-  }, function (err, results) {
-    if (err) return cb(err);
-
-    extend(payload, results);
-    cb(null, payload);
-  });
-};
-
+//TODO: needs to take snapshot and send to image processor
 var processUrl = function (phantom, job, url, cb) {
-  capturePage(phantom, url, function (err, payload) {
-    if (err) return cb(err); 
-    addIps(payload, function (err, newPayload) {
-      if (err) return cb(err); 
-
-      extend(newPayload, {
-        AccountUser: job.user,
-        FolderId: job.folderId 
+  async.auto({
+    page: partial(capturePage, phantom, url),
+    serverIp: getServerIp,
+    siteIp: partial(fetchIpForUrl, url),
+    snapshot: ["page", "serverIp", "siteIp", function (cb, results) {
+      var snapshot = Snapshot(job, results.serverIp, results.siteIp, results.page);
+        
+      cb(null, snapshot);
+    }],
+    processor: ["snapshot", function (cb, results) {
+      processSnapshot(results.snapshot, function (err, feedback) {
+        cb(err, err ? false : true);
       });
-
-      console.log(err);
-      console.log(newPayload);
-      cb(null, newPayload);
-    });
+    }]
+  }, function (err, results) {
+    cb(null, PageResult(url, !err));
   });
 };
 
@@ -101,27 +72,23 @@ var processUrls = function (options, job, cb) {
     var processFn = partial(processUrl, ph, job);
     var queue = async.queue(processFn, options.TAB_COUNT);
     var results = [];
-    var trackResult = function (err, result) {
-      if (err) console.log(err.stack);
-      else {
-        console.log(result.ServerUrl + " completed");
-        results.push(result);
-      }
+    var trackResult = function (err, pageResult) {
+      results.push(pageResult);
     };
-
-    queue.push(job.urls, trackResult);
     queue.drain = function () {
       console.log("drain called");
       cb(null, results);
       ph.exit();  
     }; 
+
+    queue.push(job.urls, trackResult);
   });
 };
 
 var server = restify.createServer();
-var mailer = nodemailer.createTransport("SMTP", options.MAIL_CONFIG);
-var processFn = partial(processUrls, options);
-var queue = async.queue(processFn, options.PHANTOM_COUNT);
+var mailer = nodemailer.createTransport("SMTP", options.email);
+var processFn = partial(processUrls, options.phantom);
+var queue = async.queue(processFn, options.phantom.PHANTOM_COUNT);
 
 server.use(restify.CORS());
 server.use(restify.acceptParser(server.acceptable));

@@ -48,6 +48,7 @@ module.exports = function (options) {
                 InitialLoadTimeUTC: timestamp.format(),
                 ViewportSize: options.viewportSize,
                 ServerUrl: url,
+                HeaderOverlapPixels: options.HEADER_OVERLAP_PIXELS || 125,
                 ExtendedProperties: [{
                   pageErrors: pageErrors 
                 }]
