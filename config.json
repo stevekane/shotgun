@@ -1,0 +1,21 @@
+{
+  "phantom": {
+    "TAB_COUNT": 20,
+    "PHANTOM_COUNT": 4,
+    "RENDER_DELAY": 4000,
+    "viewportSize": {
+      "width": 1200,
+      "height": 800
+    }
+  },
+  "processor": {
+
+  },
+  "email": {
+    "service": "Gmail",
+    "auth": {
+      "user": "testmailpv83@gmail.com",
+      "pass": "pagevault"
+    }
+  }
+}
