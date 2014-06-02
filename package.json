@@ -37,7 +37,10 @@
     "nodemailer": "^0.6.3",
     "coffeeify": "^0.6.0",
     "react": "^0.10.0",
-    "jquery-browserify": "^1.8.1"
+    "jquery-browserify": "^1.8.1",
+    "through": "^2.3.4",
+    "browserify": "^4.1.7",
+    "envify": "^1.2.1"
   },
   "devDependencies": {
     "tape": "^2.13.1"

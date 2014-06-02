@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var $, Folder, Job, Main, React, Url, appNode, appState, draw, log, map, parseUrl, partial, remotes, remove, testUrls, transactions, url, uuid, _, _i, _len;
+var $, Folder, Main, React, Url, appNode, appState, draw, log, map, parseUrl, partial, pluck, remotes, remove, testUrls, transactions, url, uuid, _, _i, _len;
 
 parseUrl = require("url").parse;
 
@@ -11,7 +11,7 @@ $ = require("jquery-browserify");
 
 uuid = require("node-uuid");
 
-partial = _.partial, map = _.map, remove = _.remove;
+partial = _.partial, pluck = _.pluck, map = _.map, remove = _.remove;
 
 Main = require("./ui.coffee");
 
@@ -42,15 +42,6 @@ Folder = function(_arg) {
     id: id,
     name: folder_name,
     childFolders: folder_ids
-  };
-};
-
-Job = function(user, folderId, urls) {
-  return {
-    user: user,
-    folderId: folderId,
-    urls: urls,
-    uuid: uuid.v4()
   };
 };
 
@@ -184,20 +175,18 @@ remotes = {
     }
   },
   sendJob: function() {
-    var job, url;
+    var url;
     url = "http://localhost:8080/capture";
-    job = Job({
-      user: appState.user.id,
-      folderId: appState.forms.batch.folderId,
-      urls: appState.forms.batch.urls
-    });
-    log(job);
     return $.ajax({
+      contentType: "application/json",
       type: "POST",
       dataType: "json",
       url: url,
-      data: job,
-      json: true
+      data: JSON.stringify({
+        userId: appState.user.id,
+        folderId: appState.forms.batch.folderId,
+        urls: pluck(appState.forms.batch.urls, "href")
+      })
     }).done(function(message) {
       return alert(message);
     }).fail(function(xhr) {

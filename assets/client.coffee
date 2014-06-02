@@ -3,7 +3,7 @@ React = require "react"
 _ = require "lodash"
 $ = require "jquery-browserify"
 uuid = require "node-uuid"
-{partial, map, remove} = _
+{partial, pluck, map, remove} = _
 Main = require "./ui.coffee"
 appNode = document.getElementById("app")
 log = (obj) -> console.log(JSON.stringify(obj, null ,2))
@@ -24,12 +24,6 @@ Folder = ({id, folder_ids, folder_name}) ->
   id: id
   name: folder_name
   childFolders: folder_ids
-
-Job = (user, folderId, urls) ->
-  user: user
-  folderId: folderId
-  urls: urls
-  uuid: uuid.v4()
 
 #END Struct defs
 
@@ -156,18 +150,17 @@ remotes =
 
   sendJob: ->
     url = "http://localhost:8080/capture"
-    job = Job
-      user: appState.user.id
-      folderId: appState.forms.batch.folderId
-      urls: appState.forms.batch.urls
-    log(job)
 
     $.ajax({
+      contentType: "application/json"
       type: "POST"
       dataType: "json"
       url: url
-      data: job
-      json: true
+      data: JSON.stringify({
+        userId: appState.user.id
+        folderId: appState.forms.batch.folderId
+        urls: pluck(appState.forms.batch.urls, "href")
+      })
     })
     .done((message) ->
       alert(message)

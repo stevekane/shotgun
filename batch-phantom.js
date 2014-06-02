@@ -21,6 +21,7 @@ var getServerIp = pvApi.getServerIp;
 //configure routes w/ instance of queue and server
 var setupRoutes = function (queue, mailer, server) {
   server.post("/capture", function (req, res, next) {
+    console.log(req.body);
     var validReq = req.body.urls && req.body.folderId && req.body.userId;
     var status = validReq ? 200 : 400;
     var message = validReq 
