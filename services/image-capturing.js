@@ -1,5 +1,4 @@
 var parseUrl = require("url").parse
-  , phantom = require("phantom")
   , moment = require("moment")
   , _ = require("lodash")
   , partial = _.partial;
@@ -20,7 +19,8 @@ module.exports = function (options) {
 
   //given an instance of phantom, process url and cb with image string
   var capturePage = function (phantom, url, cb) {
-    phantom.createPage(function (page) {
+    phantom.createPage(function (err, page) {
+      console.log("page loaded", url);
       var pageErrors = [];
 
       page.set("viewportSize", options.viewportSize)
@@ -29,13 +29,16 @@ module.exports = function (options) {
         pageErrors.push(msg);
       });
 
-      page.open(url, function () {
+      page.open(url, function (err, status) {
+        console.log("page open", status, url);
         setTimeout(function () {
 
-          page.evaluate(scrapeDom, function (dom) {
+          page.evaluate(scrapeDom, function (err, dom) {
+            console.log("page scrape DOM", url);
           
-            page.renderBase64("png", function (image) {
+            page.renderBase64("png", function (err, image) {
               var timestamp = moment.utc();
+              console.log("page rendered", url);
 
               var payload = {
                 Snapshot: {

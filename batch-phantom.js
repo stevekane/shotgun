@@ -1,5 +1,5 @@
 var dns = require("dns")
-  , phantom = require("phantom")
+  , phantom = require("node-phantom")
   , restify = require("restify")
   , async = require("async")
   , nodemailer = require("nodemailer")
@@ -21,6 +21,7 @@ var getServerIp = pvApi.getServerIp;
 //configure routes w/ instance of queue and server
 var setupRoutes = function (queue, mailer, server) {
   server.post("/capture", function (req, res, next) {
+    console.log(req.body);
     var validReq = req.body.urls && req.body.folderId && req.body.userId;
     var status = validReq ? 200 : 400;
     var message = validReq 
@@ -46,19 +47,15 @@ var fetchIpForUrl = function (url, cb) {
   });
 };
 
-//TODO: needs to take snapshot and send to image processor
 var processUrl = function (phantom, job, url, cb) {
   async.auto({
     page: partial(capturePage, phantom, url),
     serverIp: getServerIp,
     siteIp: partial(fetchIpForUrl, url),
-    snapshot: ["page", "serverIp", "siteIp", function (cb, results) {
+    processor: ["page", "serverIp", "siteIp", function (cb, results) {
       var snapshot = Snapshot(job, results.serverIp, results.siteIp, results.page);
-        
-      cb(null, snapshot);
-    }],
-    processor: ["snapshot", function (cb, results) {
-      processSnapshot(results.snapshot, function (err, feedback) {
+
+      processSnapshot(snapshot, function (err, feedback) {
         cb(err, err ? false : true);
       });
     }]
@@ -68,7 +65,7 @@ var processUrl = function (phantom, job, url, cb) {
 };
 
 var processUrls = function (options, job, cb) {
-  phantom.create(function (ph) {
+  phantom.create(function (err, ph) {
     var processFn = partial(processUrl, ph, job);
     var queue = async.queue(processFn, options.TAB_COUNT);
     var results = [];
