@@ -1,10 +1,10 @@
 parseUrl = require("url").parse
 React = require "react"
+uuid = require "node-uuid"
+Main = require "./ui.coffee"
 _ = require "lodash"
 $ = require "jquery-browserify"
-uuid = require "node-uuid"
 {partial, pluck, map, remove} = _
-Main = require "./ui.coffee"
 appNode = document.getElementById("app")
 log = (obj) -> console.log(JSON.stringify(obj, null ,2))
 
