@@ -9,7 +9,8 @@
     }
   },
   "processor": {
-
+    "url": "https://pipeline.page-vault.com",
+    "auth": "?t^RD73n^5*Fl(56UHt+{l){5m_9}puo5]ubF35#>8I4,!1258U}*[:84C1P(5I"
   },
   "email": {
     "service": "Gmail",

@@ -9,10 +9,10 @@ module.exports = function (job, serverIp, siteIp, page) {
   //TODO: implement requirements checking for constructor
 
   extend(snapshot, {
-    AccountUser: job.userId,
     FolderId: job.folderId,
+    UserToken: job.token,
     PageVaultServerIp: serverIp,
-    CaptureWebsiteIp: siteIp,
+    CapturedWebsiteIp: siteIp,
   });
 
   return snapshot;

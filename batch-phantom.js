@@ -18,14 +18,25 @@ var capturePage = cap.capturePage;
 var processSnapshot = proc.processSnapshot;
 var getServerIp = pvApi.getServerIp;
 
+//TESTS
+proc.verify(function (err, res, body) {
+  console.log(err);
+  console.log(body);
+});
+//END TESTS
+
 //configure routes w/ instance of queue and server
 var setupRoutes = function (queue, mailer, server) {
   server.post("/capture", function (req, res, next) {
-    var validReq = req.body.urls && req.body.folderId && req.body.userId;
+    console.log("body recieved");
+    var validReq = 
+      req.body.urls && 
+      req.body.folderId && 
+      req.body.token;
     var status = validReq ? 200 : 400;
     var message = validReq 
       ? "Your job is processing" 
-      : "Please supply urls, folderId, and userId";
+      : "Please supply urls, folderId, token";
     var onJobComplete = function (err, results) {
       console.log("Imagine this was emailed to you");
       console.log(results);   
@@ -52,23 +63,23 @@ var processUrl = function (phantom, job, url, cb) {
     page: partial(capturePage, phantom, url),
     serverIp: getServerIp,
     siteIp: partial(fetchIpForUrl, url),
-    snapshot: ["page", "serverIp", "siteIp", function (cb, results) {
+    processor: ["page", "serverIp", "siteIp", function (cb, results) {
       var snapshot = Snapshot(job, results.serverIp, results.siteIp, results.page);
         
-      cb(null, snapshot);
-    }],
-    processor: ["snapshot", function (cb, results) {
-      processSnapshot(results.snapshot, function (err, feedback) {
-        cb(err, err ? false : true);
+      processSnapshot(snapshot, function (err, res, feedback) {
+        cb(err, feedback);
       });
     }]
   }, function (err, results) {
+    //console.log(err);
+    console.log(results.processor);
     cb(null, PageResult(url, !err));
   });
 };
 
 var processUrls = function (options, job, cb) {
   phantom.create(function (ph) {
+    console.log("phantom created");
     var processFn = partial(processUrl, ph, job);
     var queue = async.queue(processFn, options.TAB_COUNT);
     var results = [];

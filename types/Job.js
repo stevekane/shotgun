@@ -6,12 +6,12 @@ var cloneDeep = _.cloneDeep;
 module.exports = function (hash) {
   var job = {};
 
-  mustProvide(hash, ["urls", "folderId", "userId"]);
+  mustProvide(hash, ["urls", "folderId", "token"]);
 
   extend(job, {
     urls: cloneDeep(hash.urls),
     folderId: hash.folderId,
-    userId: hash.userId
+    token: hash.token
   });
 
   return job;

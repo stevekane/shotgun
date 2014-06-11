@@ -40,7 +40,8 @@
     "jquery-browserify": "^1.8.1",
     "through": "^2.3.4",
     "browserify": "^4.1.7",
-    "envify": "^1.2.1"
+    "envify": "^1.2.1",
+    "only": "0.0.2"
   },
   "devDependencies": {
     "tape": "^2.13.1"
